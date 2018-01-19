@@ -13,13 +13,17 @@ var projectiles = {
 };
 
 function startGame(){
+  winnerText = new component("50px","consolas","white",window.innerWidth / 2 - 300, window.innerHeight / 1.5, "text");
+  meleeWinnerCube = new component(150,150,"green",(window.innerWidth / 2) - 75, 200);
   //characters
   melee = new component(30,30,"green",300,300);
   ranged = new component(30,40,"blue",300,300);
   sowrdsman = new component();
-  //text that displays the pleyers damage taken
+  //text that displays the pleyers damage taken and lives left
   playerOneDamage = new component("38px","consolas","white",window.innerWidth / 3.5,window.innerHeight - 100, "text");
   playerTwoDamage = new component("38px","consolas","white",window.innerWidth / 1.5,window.innerHeight - 100,"text");
+  playerOneLives = new component("38","sans-serif","white",window.innerWidth / 3.5, window.innerHeight - 50, "text");
+  playerTwoLives = new component("38","sans-serif","white",window.innerWidth / 1.5, window.innerHeight - 50, "text");
   //blue square used when melee character is using dSpecial
   chargingAnimation = new component(50,50,"blue",0,0)
   //training object
@@ -30,6 +34,7 @@ function startGame(){
   platformTwo = new component();
   myGameArea.start();
 }
+
 //mygame area, start, clear, and stop functions.
 var myGameArea = {
   canvas : document.createElement("canvas"),
@@ -46,9 +51,12 @@ var myGameArea = {
   },
   stop : function(){
     clearInterval(this.interval);
+  },
+  clearAll : function(){
+    this.canvas.clear();
   }
-};
 
+};
 
 function everyInterval(n){
   if ((myGameArea.frameNo / n) % 1 === 0) {
@@ -56,6 +64,7 @@ function everyInterval(n){
   }
   return false
 };
+
 //create and manipulate components
 function component(width,height,color,x,y,type){
   this.type = type;
@@ -74,6 +83,7 @@ function component(width,height,color,x,y,type){
   this.jumpCount = 0;
   this.damage = 0;
   this.charge = 0;
+  this.lives = 2;
   this.charging = false;
   this.canMoveLeft = true;
   this.canMoveRight = true;
@@ -175,7 +185,7 @@ function component(width,height,color,x,y,type){
 
   this.hitBottom = function(){
     //make it so it falls of stage if not over it
-    var rockbottom = myGameArea.canvas.height;
+    var rockbottom = myGameArea.canvas.height + 100;
     if (this.crashWith(stage)){
       rockbottom = myGameArea.canvas.height - this.height - (myGameArea.canvas.height - stage.y);
     };
@@ -190,6 +200,15 @@ function component(width,height,color,x,y,type){
   this.clearSpeeds = function(){
     this.speedX = 0;
     this.speedY = 0;
+  };
+
+  this.respawn = function(){
+    this.x = (window.innerWidth / 2) - 15;
+    this.y = 300;
+    this.update();
+    this.damage = 0;
+    this.clearSpeeds();
+    this.gravitySpeed = 0;
   };
 
   this.jump = function(){
@@ -426,26 +445,69 @@ function updateChargeAnimation(character){
     chargingAnimation.update()
   }
 }
-
-
-
-function updateGameArea(){
-  myGameArea.clear();
-  punchingBag.newPos();
-  if (punchingBag.crashWith(stage)) {
-    punchingBag.clearSpeeds();
-  }
-  updateChargeAnimation(melee);
-  updateProjectiles();
+function updateTexts(){
   playerOneDamage.text = Math.round(melee.damage * 10) + "%";
   playerOneDamage.update();
   playerTwoDamage.text = Math.round(punchingBag.damage * 10) + "%";
   playerTwoDamage.update();
+  playerOneLives.text = " " + melee.lives;
+  playerOneLives.update();
+  playerTwoLives.text = " " + punchingBag.lives;
+  playerTwoLives.update();
+}
+
+function updateCharacters() {
+  punchingBag.newPos();
+  if (punchingBag.crashWith(stage)) {
+    punchingBag.clearSpeeds();
+  }
   punchingBag.update();
   melee.newPos();
   melee.update();
   stage.update();
-};
+}
+
+function isOffScreen(){
+  if (punchingBag.y < 0 ||
+    punchingBag.y > window.innerHeight ||
+    punchingBag.x < 0 ||
+    punchingBag.x > window.innerWidth) {
+      punchingBag.respawn();
+      punchingBag.lives -= 1;
+  }
+  if (melee.y < 50 ||
+    melee.y > window.innerHeight + 50 ||
+    melee.x < 50 ||
+    melee.x > window.innerWidth + 50) {
+      melee.respawn();
+      melee.lives -= 1;
+  }
+}
+
+function gameOver(){
+  if (punchingBag.lives == 0 ||
+    melee.lives == 0) {
+      var winner = "Punching Bag";
+      if (punchingBag.lives == 0) {
+        winner = "Green Cube"
+      }
+      meleeWinnerCube.update();
+      winnerText.text = "The winner is... " + winner + "!";
+      winnerText.update();
+      myGameArea.clearAll()
+      myGameArea.stop();
+  }
+}
+
+function updateGameArea(){
+  myGameArea.clear();
+  isOffScreen();
+  gameOver();
+  updateChargeAnimation(melee);
+  updateProjectiles();
+  updateTexts();
+  updateCharacters();
+}
 
 window.addEventListener("keydown", function(event){
   switch (event.which) {
