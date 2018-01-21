@@ -24,10 +24,10 @@ function startGame(){
   //text that displays the pleyers damage taken and lives left
   playerOneDamage = new component("38px","consolas","white",window.innerWidth / 3.5,window.innerHeight - 100, "text");
   playerTwoDamage = new component("38px","consolas","white",window.innerWidth / 1.5,window.innerHeight - 100,"text");
-  playerOneLivesOne = new component(15,15,"green",window.innerWidth / 3.5, window.innerHeight - 50);
-  playerOneLivesTwo = new component(15,15,"green",(window.innerWidth / 3.5) + 20, window.innerHeight - 50);
-  playerTwoLivesOne = new component(15,25,"purple",window.innerWidth / 1.5, window.innerHeight - 50);
-  playerTwoLivesTwo = new component(15,25,"purple",(window.innerWidth / 1.5) + 20, window.innerHeight - 50);
+  playerOneLivesOne = new component(15,15,"green",window.innerWidth / 3.5, window.innerHeight - 80);
+  playerOneLivesTwo = new component(15,15,"green",(window.innerWidth / 3.5) + 20, window.innerHeight - 80);
+  playerTwoLivesOne = new component(15,25,"purple",window.innerWidth / 1.5, window.innerHeight - 90);
+  playerTwoLivesTwo = new component(15,25,"purple",(window.innerWidth / 1.5) + 20, window.innerHeight - 90);
   //blue square used when melee character is using dSpecial
   chargingAnimation = new component(50,50,"blue",0,0)
   //training object
