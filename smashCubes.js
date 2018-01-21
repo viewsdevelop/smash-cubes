@@ -14,20 +14,23 @@ var projectiles = {
 
 function startGame(){
   winnerText = new component("50px","consolas","white",window.innerWidth / 2 - 300, window.innerHeight / 1.5, "text");
-  meleeWinnerCube = new component(150,150,"green",(window.innerWidth / 2) - 75, 200);
+  meleeWinnerSprite = new component(150,150,"green",(window.innerWidth / 2) - 75, 200);
+  punchingBagWinnerSprite = new component(150,250,"purple",(window.innerWidth / 2) - 75,150)
   //characters
   melee = new component(30,30,"green",300,300);
-  ranged = new component(30,40,"blue",300,300);
+  ranged = new component(30,40,"purple",300,300);
   sowrdsman = new component();
   //text that displays the pleyers damage taken and lives left
   playerOneDamage = new component("38px","consolas","white",window.innerWidth / 3.5,window.innerHeight - 100, "text");
   playerTwoDamage = new component("38px","consolas","white",window.innerWidth / 1.5,window.innerHeight - 100,"text");
-  playerOneLives = new component("38","sans-serif","white",window.innerWidth / 3.5, window.innerHeight - 50, "text");
-  playerTwoLives = new component("38","sans-serif","white",window.innerWidth / 1.5, window.innerHeight - 50, "text");
+  playerOneLivesOne = new component(15,15,"green",window.innerWidth / 3.5, window.innerHeight - 50);
+  playerOneLivesTwo = new component(15,15,"green",(window.innerWidth / 3.5) + 20, window.innerHeight - 50);
+  playerTwoLivesOne = new component(15,25,"purple",window.innerWidth / 1.5, window.innerHeight - 50);
+  playerTwoLivesTwo = new component(15,25,"purple",(window.innerWidth / 1.5) + 20, window.innerHeight - 50);
   //blue square used when melee character is using dSpecial
   chargingAnimation = new component(50,50,"blue",0,0)
   //training object
-  punchingBag = new component(30,60,"purple",(window.innerWidth / 2) - 15,300);
+  punchingBag = new component(30,60,"pruple",(window.innerWidth / 2) - 15,300);
   //stage and platforms
   stage = new component(window.innerWidth / 1.8,10,"black",(window.innerWidth - window.innerWidth / 1.8) / 2,500);
   platformOne = new component();
@@ -53,16 +56,9 @@ var myGameArea = {
     clearInterval(this.interval);
   },
   clearAll : function(){
-    this.canvas.clear();
+    pizzasAreTastyAsFuck
   }
 
-};
-
-function everyInterval(n){
-  if ((myGameArea.frameNo / n) % 1 === 0) {
-    return true
-  }
-  return false
 };
 
 //create and manipulate components
@@ -209,6 +205,7 @@ function component(width,height,color,x,y,type){
     this.damage = 0;
     this.clearSpeeds();
     this.gravitySpeed = 0;
+    this.charge = 0;
   };
 
   this.jump = function(){
@@ -364,6 +361,13 @@ function component(width,height,color,x,y,type){
   };
 };
 
+function everyInterval(n){
+  if ((myGameArea.frameNo / n) % 1 === 0) {
+    return true
+  }
+  return false
+};
+
 function updateProjectiles(){ //updates projectiles in the proper direction
   let verticalSpeed = 10;
   let horizontalSpeed = 10;
@@ -450,10 +454,8 @@ function updateTexts(){
   playerOneDamage.update();
   playerTwoDamage.text = Math.round(punchingBag.damage * 10) + "%";
   playerTwoDamage.update();
-  playerOneLives.text = " " + melee.lives;
-  playerOneLives.update();
-  playerTwoLives.text = " " + punchingBag.lives;
-  playerTwoLives.update();
+  displayLivesP1(melee.lives);
+  displayLivesP2(punchingBag.lives);
 }
 
 function updateCharacters() {
@@ -488,14 +490,40 @@ function gameOver(){
   if (punchingBag.lives == 0 ||
     melee.lives == 0) {
       var winner = "Punching Bag";
+      var winnerSprite = punchingBagWinnerSprite;
       if (punchingBag.lives == 0) {
         winner = "Green Cube"
+        winnerSprite = meleeWinnerSprite;
       }
-      meleeWinnerCube.update();
+      winnerSprite.update();
       winnerText.text = "The winner is... " + winner + "!";
       winnerText.update();
-      myGameArea.clearAll()
+      myGameArea.clearAll();
       myGameArea.stop();
+  }
+}
+
+function displayLivesP1(num){
+  switch (num) {
+    case 2:
+      playerOneLivesOne.update();
+      playerOneLivesTwo.update();
+      break;
+    default:
+      playerOneLivesOne.update();
+      break;
+  }
+}
+
+function displayLivesP2(num) {
+  switch (num) {
+    case 2:
+      playerTwoLivesOne.update();
+      playerTwoLivesTwo.update();
+      break;
+    default:
+      playerTwoLivesOne.update();
+      break;
   }
 }
 
@@ -508,6 +536,10 @@ function updateGameArea(){
   updateTexts();
   updateCharacters();
 }
+
+window.addEventListener("resize", function(event){
+
+});
 
 window.addEventListener("keydown", function(event){
   switch (event.which) {
