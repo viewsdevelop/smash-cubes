@@ -1,5 +1,6 @@
 var activeMap;
 var activeCharacter;
+var isPaused = false;
 //stores projectiles, keys corespond to cuadrants with the character that creates them being (0,0)
 var projectiles = {
   "(0,-)":[],
@@ -54,11 +55,7 @@ var myGameArea = {
   },
   stop : function(){
     clearInterval(this.interval);
-  },
-  clearAll : function(){
-    pizzasAreTastyAsFuck
   }
-
 };
 
 //create and manipulate components
@@ -486,23 +483,29 @@ function isOffScreen(){
   }
 }
 
-function gameOver(){
+//checks if game is over returns true or false
+function isGameOver(){
   if (punchingBag.lives == 0 ||
     melee.lives == 0) {
-      var winner = "Punching Bag";
-      var winnerSprite = punchingBagWinnerSprite;
-      if (punchingBag.lives == 0) {
-        winner = "Green Cube"
-        winnerSprite = meleeWinnerSprite;
-      }
-      winnerSprite.update();
-      winnerText.text = "The winner is... " + winner + "!";
-      winnerText.update();
-      myGameArea.clearAll();
-      myGameArea.stop();
+      return true
   }
+  return false
 }
 
+//ends game display winner text
+function gameOver(){
+    var winner = "Punching Bag";
+    var winnerSprite = punchingBagWinnerSprite;
+    if (punchingBag.lives == 0) {
+      winner = "Green Cube"
+      winnerSprite = meleeWinnerSprite;
+    }
+    winnerSprite.update();
+    winnerText.text = "The winner is... " + winner + "!";
+    winnerText.update();
+}
+
+//PlayerOne lives sprite thingy
 function displayLivesP1(num){
   switch (num) {
     case 2:
@@ -513,8 +516,9 @@ function displayLivesP1(num){
       playerOneLivesOne.update();
       break;
   }
-}
+};
 
+//PlayerTwo Lives sprite thingy
 function displayLivesP2(num) {
   switch (num) {
     case 2:
@@ -527,14 +531,57 @@ function displayLivesP2(num) {
   }
 }
 
+//The update homies, making shit work
+function callTheUpdateCrew(params) {
+  if (isGameOver()) {
+    gameOver()
+  } else {
+    isOffScreen();
+    updateChargeAnimation(melee);
+    updateProjectiles();
+    updateTexts();
+    updateCharacters();
+  };
+};
+
 function updateGameArea(){
   myGameArea.clear();
-  isOffScreen();
-  gameOver();
-  updateChargeAnimation(melee);
-  updateProjectiles();
-  updateTexts();
-  updateCharacters();
+  callTheUpdateCrew();
+}
+
+function showMenu(){
+  if (isPaused) {
+    document.getElementById('menu-outer-container').style.display = "none";
+    myGameArea.start();
+    isPaused = false;
+  } else {
+      document.getElementById('menu-outer-container').style.display = "flex";
+      myGameArea.stop();
+      isPaused = true;
+    }
+};
+
+function restartGame() {
+  myGameArea.stop();
+  myGameArea.clear();
+  startGame();
+  projectiles["(0,-)"] = [];
+  projectiles["(0,+)"] = [];
+  projectiles["(-,0)"] = [];
+  projectiles["(+,0)"] = [];
+  projectiles["(+,+)"] = [];
+  projectiles["(-,+)"] = [];
+  projectiles["(-,-)"] = [];
+  projectiles["(+,-)"] = [];
+  melee.lives = 2;
+  punchingBag.lives = 2;
+  document.getElementById('menu-outer-container').style.display = "none";
+  isPaused = false;
+}
+
+function concedeGame(){
+  showMenu();
+  melee.lives = 0;
 }
 
 window.addEventListener("resize", function(event){
@@ -587,5 +634,12 @@ window.addEventListener("keyup", function(event){
     case 87:
       melee.clearSpecial();
       break;
+    case 27: 
+      if (isPaused) {
+        showMenu();
+      } else {
+        showMenu();
+
+      }
   };
 });

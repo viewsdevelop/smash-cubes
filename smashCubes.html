@@ -6,20 +6,21 @@
     <title>Smash Cubes</title>
   </head>
   <body onload="startGame();">
-    <!-- <nav>
-      <ul>
-        <li><a href=""></a></li>
-        <li><a href=""></a></li>
-      </ul>
+    
+    <div id="menu-outer-container" class="outer-container">
 
-      <ul>
-        <li><a href=""></a></li>
-        <li><a href=""></a></li>
-      </ul>
-    </nav>
-    <div class="container">
-        <h1>Practice Mode</h1>
-    </div> -->
+      <div id="menu-title-container" class="menu-item-container">
+        <h2>menu</h2>
+      </div>
+
+      <div id="restart-container" class="menu-item-container">
+        <a id="restart-button" class="menu-button" onclick="restartGame();">Restart</a>
+      </div>
+
+      <div id="concede-game-container" class="menu-item-container">
+        <a id="concede-game-button" class="menu-button" onclick="concedeGame();">Concede Game</a>
+      </div>
+    </div>
     
     <script src="smashCubes.js" charset="utf-8"></script>
   </body>
