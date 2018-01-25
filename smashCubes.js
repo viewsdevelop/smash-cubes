@@ -1,6 +1,7 @@
 var activeMap;
 var activeCharacter;
 var isPaused = false;
+var showingInstructions = false;
 //stores projectiles, keys corespond to cuadrants with the character that creates them being (0,0)
 var projectiles = {
   "(0,-)":[],
@@ -255,107 +256,110 @@ function component(width,height,color,x,y,type){
    this.clearPressDown = function(){
      this.downPressed = false;
    };
-
-  this.attack = function() { //adds to this's size to make it attack deending on the key pressed;
-    if (this.canAttack) {
-      if (this.speedX == 5) {
-        this.width += 20;
-        this.fAttack = true;
-      } else if (this.speedX == -5) {
-        this.width += 20;
-        this.x -= 20;
-        this.bAttack = true;
-      } else if (this.upPressed) {
-        this.height += 20;
-        this.y -= 20;
-        this.uAttack = true;
-      } else if (this.downPressed) {
-        this.height += 20;
-        this.dAttack = true;
-      } else if (this.speedX == 0) {
-        this.width += 21;
-        this.x -= 7;
-        this.nAttack = true;
+   this.meleeMoves = {
+    attack: function() { //adds to this's size to make it attack deending on the key pressed;
+      if (melee.canAttack) {
+        if (melee.speedX == 5) {
+          melee.width += 20;
+          melee.fAttack = true;
+        } else if (melee.speedX == -5) {
+          melee.width += 20;
+          melee.x -= 20;
+          melee.bAttack = true;
+        } else if (melee.upPressed) {
+          melee.height += 20;
+          melee.y -= 20;
+          melee.uAttack = true;
+        } else if (this.downPressed) {
+          melee.height += 20;
+          melee.dAttack = true;
+        } else if (melee.speedX == 0) {
+          melee.width += 21;
+          melee.x -= 7;
+          melee.nAttack = true;
+        };
       };
-    };
-    this.canAttack = false;
-    this.didHit(punchingBag);
-  };
+      melee.canAttack = false;
+      melee.didHit(punchingBag);
+    },
 
-  this.clearAttack = function(){ //clears the change in this's size from the attack function
+    clearAttack: function(){ //clears the change in this's size from the attack funcmelee
 
-    if (this.fAttack) {
-      this.width -= 20;
-      this.fAttack = false;
-    } else if (this.bAttack) {
-      this.width -= 20;
-      this.x += 20;
-      this.bAttack = false;
-    } else if (this.uAttack) {
-      this.height -= 20;
-      this.y += 20;
-      this.uAttack = false;
-    } else if (this.dAttack) {
-      this.height -= 20;
-      this.dAttack = false;
-    } else if (this.nAttack) {
-      this.width -= 21;
-      this.x += 7;
-      this.nAttack = false;
-    };
-    this.canAttack = true;
-  };
+      if (melee.fAttack) {
+        melee.width -= 20;
+        melee.fAttack = false;
+      } else if (melee.bAttack) {
+        melee.width -= 20;
+        melee.x += 20;
+        melee.bAttack = false;
+      } else if (melee.uAttack) {
+        melee.height -= 20;
+        melee.y += 20;
+        melee.uAttack = false;
+      } else if (melee.dAttack) {
+        melee.height -= 20;
+        melee.dAttack = false;
+      } else if (melee.nAttack) {
+        melee.width -= 21;
+        melee.x += 7;
+        melee.nAttack = false;
+      };
+      melee.canAttack = true;
+    },
 
-  this.specialAttack = function(){
-    if(this.canSpecial){
-      if (this.speedX == 5) { //if right key pressed, create projectile towards right: HADOUKEN!
-        if (this.charge >= 10 ) {
-          projectiles["(+,0)"].push(new component(this.charge,this.charge,"blue",this.x,this.y + (this.height / 3)));// size depends on charge
-          this.charge -= 10; // reduces charge after using
-        }
-        this.fSpecial = true; // same as above but to the left: HADOUKEN!
-      } else if (this.speedX == -5) {
-        if (this.charge >= 10 ) {
-          projectiles["(-,0)"].push(new component(this.charge,this.charge,"blue",this.x + (this.width),this.y + (this.height / 3)));
-          this.charge -= 10;
-        }
-        this.bSpecial = true
-      } else if (this.upPressed) { //upwards jump that strikes twice at beggining of animation
-        this.gravitySpeed = -20;
-        this.attack();
-        this.attack();
-        this.clearAttack();
-        this.uSpecial = true;
-        this.jumpCount = 2;
-        this.canSpecial = false;
-      } else if (this.downPressed) { //adds to the charge variable until charge is 55
-        if (this.charge <= 50) {
-          this.charge += 5;
-          this.charging = true;
-        }
+    specialAttack: function(){
+      if(melee.canSpecial){
+        if (melee.speedX == 5) { //if right key pressed, create projectile towards right: HADOUKEN!
+          if (melee.charge >= 10 ) {
+            projectiles["(+,0)"].push(new component(melee.charge,melee.charge,"blue",melee.x,melee.y + (melee.height / 3)));// size depends on charge
+            melee.charge -= 10; // reduces charge after using
+          }
+          melee.fSpecial = true; // same as above but to the left: HADOUKEN!
+        } else if (melee.speedX == -5) {
+          if (melee.charge >= 10 ) {
+            projectiles["(-,0)"].push(new component(melee.charge,melee.charge,"blue",melee.x + (melee.width),melee.y + (melee.height / 3)));
+            melee.charge -= 10;
+          }
+          melee.bSpecial = true
+        } else if (melee.upPressed) { //upwards jump that strikes twice at beggining of animation
+          melee.gravitySpeed = -20;
+          melee.attack();
+          melee.attack();
+          melee.clearAttack();
+          melee.uSpecial = true;
+          melee.jumpCount = 2;
+          melee.canSpecial = false;
+        } else if (melee.downPressed) { //adds to the charge variable until charge is 55
+          if (melee.charge <= 50) {
+            melee.charge += 5;
+            melee.charging = true;
+          }
 
-        this.dSpecial = true;
-      } else if (this.charge > 50){ // neutral special, makes charge 0: too OP // not sure if let the projectile go through stage or dissapear on contact
-        let projectileSize = 25;
-        projectiles["(0,+)"].push(new component(projectileSize, projectileSize,"black",this.x + (this.width / 2),this.y + (this.height / 2)));
-        projectiles["(+,0)"].push(new component(projectileSize, projectileSize,"black",this.x + (this.width / 2),this.y + (this.height / 2)));
-        projectiles["(-,0)"].push(new component(projectileSize, projectileSize,"black",this.x + (this.width / 2),this.y + (this.height / 2)));
-        projectiles["(+,+)"].push(new component(projectileSize, projectileSize,"black",this.x + (this.width / 2),this.y + (this.height / 2)));
-        projectiles["(-,+)"].push(new component(projectileSize, projectileSize,"black",this.x + (this.width / 2),this.y + (this.height / 2)));
-        projectiles["(-,-)"].push(new component(projectileSize, projectileSize,"black",this.x + (this.width / 2),this.y + (this.height / 2)));
-        projectiles["(+,-)"].push(new component(projectileSize, projectileSize,"black",this.x + (this.width / 2),this.y + (this.height / 2)));
-        this.charge = 0;
-        }
-        this.nSpecial = true;
-    };
+          melee.dSpecial = true;
+        } else if (this.charge > 50){ // neutral special, makes charge 0: too OP // not sure if let the projectile go through stage or dissapear on contact
+          let projectileSize = 25;
+          projectiles["(0,+)"].push(new component(projectileSize, projectileSize,"black",melee.x + (melee.width / 2),melee.y + (melee.height / 2)));
+          projectiles["(+,0)"].push(new component(projectileSize, projectileSize,"black",melee.x + (melee.width / 2),melee.y + (melee.height / 2)));
+          projectiles["(-,0)"].push(new component(projectileSize, projectileSize,"black",melee.x + (melee.width / 2),melee.y + (melee.height / 2)));
+          projectiles["(+,+)"].push(new component(projectileSize, projectileSize,"black",melee.x + (melee.width / 2),melee.y + (melee.height / 2)));
+          projectiles["(-,+)"].push(new component(projectileSize, projectileSize,"black",melee.x + (melee.width / 2),melee.y + (melee.height / 2)));
+          projectiles["(-,-)"].push(new component(projectileSize, projectileSize,"black",melee.x + (melee.width / 2),melee.y + (melee.height / 2)));
+          projectiles["(+,-)"].push(new component(projectileSize, projectileSize,"black",melee.x + (melee.width / 2),melee.y + (melee.height / 2)));
+          melee.charge = 0;
+          }
+          melee.nSpecial = true;
+      };
+    },
+
+    clearSpecial: function(){
+      if (melee.dSpecial) {
+        melee.charging = false;
+      };
+    }
   }
-
-  this.clearSpecial = function(){
-    if (this.dSpecial) {
-      this.charging = false;
-
-    };
-  };
+  this.mageMoves = {
+    
+  }
 };
 
 function everyInterval(n){
@@ -579,6 +583,15 @@ function restartGame() {
   isPaused = false;
 }
 
+function showInstructions() {
+  if (showingInstructions) {
+    document.getElementById('instructions-outer-container').style.display = "none";
+  } else {
+    showMenu();
+    document.getElementById('instructions-outer-container').style.display = "flex";
+  }
+}
+
 function concedeGame(){
   showMenu();
   melee.lives = 0;
@@ -606,10 +619,10 @@ window.addEventListener("keydown", function(event){
       melee.pressDown();
       break;
     case 81:
-      melee.attack();
+      melee.meleeMoves.attack();
       break;
     case 87:
-      melee.specialAttack();
+      melee.meleeMoves.specialAttack();
       break;
   };
 });
@@ -629,10 +642,10 @@ window.addEventListener("keyup", function(event){
       melee.clearPressDown();
       break;
     case 81:
-      melee.clearAttack();
+      melee.meleeMoves.clearAttack();
       break;
     case 87:
-      melee.clearSpecial();
+      melee.meleeMoves.clearSpecial();
       break;
     case 27: 
       if (isPaused) {

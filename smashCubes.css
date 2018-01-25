@@ -42,3 +42,18 @@ canvas{
 #menu-title-container{
   height: 12.5%;
 }
+
+.key-example{
+  border: 1px solid #ffffff;
+
+}
+
+#instructions-outer-container{
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+}
+
+.instructions-item-container{
+  height: 20%;
+}
